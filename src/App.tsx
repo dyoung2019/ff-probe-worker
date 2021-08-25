@@ -1,16 +1,36 @@
 import { h } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect, useRef } from 'preact/hooks';
 import logo from './logo.png';
 import './App.css';
 
 function App() {
-  // Create the count state.
-  const [count, setCount] = useState(0);
-  // Create the counter (+1 every second).
+  // Create the count state
+
+  const workerRef = useRef<Worker>(null);
   useEffect(() => {
-    const timer = setTimeout(() => setCount(count + 1), 1000);
-    return () => clearTimeout(timer);
-  }, [count, setCount]);
+      const worker = new Worker(new URL('./worker.js', import.meta.url));
+
+      console.log('index init')
+
+      console.log('app postMessage 0')
+      worker.postMessage({ a: 1 });
+      console.log('app postMessage 1')
+
+      worker.onmessage = (event:any) => {}
+
+      // };
+
+      worker.addEventListener("message", (event:any) => {
+        console.log('app', event.data);
+      });
+      console.log('worker init');
+
+      return () => {
+        console.log('terminate');
+        worker.terminate();
+      }
+  }, []);
+
   // Return the App component.
   return (
     <div className="App">
@@ -18,9 +38,6 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.jsx</code> and save to reload.
-        </p>
-        <p>
-          Page has been open for <code>{count}</code> seconds.
         </p>
         <p>
           <a

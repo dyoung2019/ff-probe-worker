@@ -3,9 +3,18 @@ export default {
   mount: {
     public: { url: '/', static: true },
     src: { url: '/dist' },
+    dist: { url: '/dist' },
   },
   plugins: [
     '@prefresh/snowpack',
+    [
+      // seperate build for worker
+      '@snowpack/plugin-run-script',
+      {
+        cmd: 'npm run build:worker',
+        watch: 'npm run watch:worker',
+      },
+    ],    
     '@snowpack/plugin-dotenv',
     [
       '@snowpack/plugin-typescript',
